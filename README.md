@@ -84,5 +84,5 @@ This will encrypt the file `my_secret_file.txt` and create a new file named `my_
 ## Disclaimer
 
 This script is for educational purposes only. While it offers basic encryption, ensure you understand the limitations and potential vulnerabilities before using it for sensitive data.
-```
+
 
