@@ -18,8 +18,8 @@ To use this script, ensure you have OpenSSL installed on your system. If you don
 ### Ubuntu/Debian
 
 ```bash
-sudo apt-get update
-sudo apt-get install openssl
+sudo apt update
+sudo apt install openssl
 ```
 ### CentOS/RHEL
 

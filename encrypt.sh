@@ -1,4 +1,8 @@
 #!/bin/bash
+
+
+
+
 echo "Enter password for AES-256-CBC encryption:"
 read -s password
 
