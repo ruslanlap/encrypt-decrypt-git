@@ -13,6 +13,31 @@ This script provides a simple yet secure method to encrypt and decrypt files usi
 
 - Bash shell
 - OpenSSL library
+To use this script, ensure you have OpenSSL installed on your system. If you don't have it installed, you can typically install it using your system's package manager. Here are some examples:
+
+### Ubuntu/Debian
+
+```bash
+sudo apt-get update
+sudo apt-get install openssl
+```
+### CentOS/RHEL
+
+```bash
+
+sudo yum install openssl
+```
+### macOS
+
+```bash
+
+brew install openssl
+```
+### Windows
+
+For Windows, you can download OpenSSL binaries from the official OpenSSL website here.
+
+
 
 ## Usage
 
