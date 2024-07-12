@@ -1,1 +1,1 @@
-# ecrypt-decrypt-git
+# encrypt-decrypt-git
