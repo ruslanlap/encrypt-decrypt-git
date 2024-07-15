@@ -1,20 +1,5 @@
 #!/bin/bash
 
-# Function for loading animation
-loading_animation() {
-    local pid=$1
-    local delay=0.1
-    local spinstr='|/-\'
-    while ps a | awk '{print $1}' | grep -q $pid; do
-        local temp=${spinstr#?}
-        printf " \e[1;33m[%c]\e[0m  " "$spinstr"
-        local spinstr=$temp${spinstr%"$temp"}
-        sleep $delay
-        printf "\b\b\b\b\b\b"
-    done
-    printf "    \b\b\b\b"
-}
-
 # Colorful banner
 echo -e "\n\e[1;35m🔐 Encryption/Decryption Wizard 🔓\e[0m"
 echo -e "\e[1;36m====================================\e[0m\n"
