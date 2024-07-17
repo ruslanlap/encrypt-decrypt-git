@@ -4,15 +4,15 @@ This script provides a simple yet secure method to encrypt and decrypt files usi
 
 ## 📋 Table of Contents
 
-- [⭐ Features](#features)
-- [📦 Requirements](#requirements)
-- [⚙️ Installation](#installation)
-- [📝 Usage](#usage)
-- [💡 Example](#example)
-- [🔒 Security Considerations](#security-considerations)
-- [🔍 How it Works](#how-it-works)
-- [📜 Python](#encryptpy)
-- [⚠️ Disclaimer](#disclaimer)
+- [⭐ Features](#-features)
+- [📦 Requirements](#-requirements)
+- [⚙️ Installation](#-installation)
+- [📝 Usage](#-usage)
+- [💡 Example](#-example)
+- [🔒 Security Considerations](#-security-considerations)
+- [🔍 How it Works](#-how-it-works)
+- [📜 encrypt.py](#encryptpy)
+- [⚠️ Disclaimer](#-disclaimer)
 
 ## ⭐ Features
 
@@ -32,21 +32,29 @@ To use this script, ensure you have OpenSSL installed on your system. If you don
 
 ### Ubuntu/Debian
 
-```sudo apt update```
-```sudo apt install openssl```
+```sh
+sudo apt update
+sudo apt install openssl
+```
 ### CentOS/RHEL
 
-```sudo yum install openssl```
+```sh
+sudo yum install openssl
+```
 ### macOS
 
-```brew install openssl```
+```sh
+brew install openssl
+```
 ### Windows
 
 For Windows, you can download OpenSSL binaries from the official OpenSSL website [here](https://www.openssl.org).
 
 ## 📝 Usage
 
+```sh
 ./encrypt.sh [encrypt|decrypt] <inputfile>
+```
 - `encrypt`: Encrypts the specified file.
 - `decrypt`: Decrypts the specified file.
 - `<inputfile>`: The path to the file you want to encrypt or decrypt.
@@ -55,7 +63,7 @@ For Windows, you can download OpenSSL binaries from the official OpenSSL website
 
 Encrypt a file:
 
-```bash
+```sh
 ./encrypt.sh encrypt my_secret_file.txt
 ```
 This will encrypt the file `my_secret_file.txt` and create a new file named `my_secret_file.txt_crypt`.
@@ -88,8 +96,9 @@ The `encrypt.py` script offers the same functionality as the Bash script, enabli
 
 ### Usage
 
-bash
+```sh
 python encrypt.py [encrypt|decrypt] <inputfile>
+```
 
 - `encrypt`: Encrypts the specified file.
 - `decrypt`: Decrypts the specified file.
@@ -99,7 +108,7 @@ python encrypt.py [encrypt|decrypt] <inputfile>
 
 Encrypt a file:
 
-```bash
+```sh
 python encrypt.py encrypt my_secret_file.txt
 ```
 
@@ -108,4 +117,4 @@ This will encrypt the file `my_secret_file.txt` and create a new file named `my_
 ## ⚠️ Disclaimer
 
 This script is for educational purposes only. While it offers basic encryption, ensure you understand the limitations and potential vulnerabilities before using it for sensitive data.
-
+```
