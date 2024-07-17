@@ -1,70 +1,50 @@
-name: Python application
+name: KBOT-CICD
 
-on:
-  push:
-    branches: [ "master" ]
-    tags:
-      - "v*.*.*"  # Trigger on version tags like v1.0.0
-  pull_request:
-    branches: [ "master" ]
-
-permissions:
-  contents: write  # Need write permission to create a release
+on: push
 
 jobs:
-  build:
-
+  ci:
+    name: CI
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
+      - name: Run tests
+        run: make test
+
+      - name: DockerHub login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & Push
+        env:
+          APP: "kbot"
+          REGISTRY: ${{ secrets.DOCKERHUB_USERNAME  }}
+        run: make image push
+
+  cd:
+    name: CD
+    needs: ci
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
       with:
-        python-version: "3.10"
+        fetch-depth: 0
+    - run: echo "VERSION=$(git describe --tags --abbrev=0)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-    - name: Lint with flake8
-      run: |
-        # Stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # Exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-
-    - name: Test with pytest
-      run: |
-        pytest tests
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - uses: mikefarah/yq@master
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
-
-    - name: Upload Release Asset
-      if: success() && steps.create_release.outputs.upload_url != ''
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: path/to/your/asset.zip  # Replace with the actual path to your asset
-        asset_name: asset.zip  # Replace with the actual name of your asset
-        asset_content_type: application/zip
-
-    - name: Check release creation status
-      if: failure()
-      run: |
-        echo "Release creation failed. Please check if the tag already exists or other issues."
-        exit 1
+        cmd: yq -i '.image.tag=strenv(VERSION)' helm/values.yaml
+        
+    - run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git commit -am "Update version $VERSION"
+        git push
