@@ -6,7 +6,7 @@ This script provides a simple yet secure method to encrypt and decrypt files usi
 
 - [⭐ Features](#-features)
 - [📦 Requirements](#-requirements)
-- [⚙️ Installation](#-installation)
+- [⚙️Installation](#-installation)
 - [📝 Usage](#-usage)
 - [💡 Example](#-example)
 - [🔒 Security Considerations](#-security-considerations)
