@@ -19,15 +19,19 @@ def prompt_password():
     password = getpass.getpass("🔑 \033[1;34mEnter password for AES-256-CBC encryption (or press Enter to use hardcoded):\033[0m ")
     return password if password else "your_hardcoded_password"  # Replace with your hardcoded password
 
-def check_arguments():
-    if len(sys.argv) < 3:
-        print("\n❌ \033[1;31mUsage: {} [encrypt|decrypt] <inputfile>\033[0m".format(sys.argv[0]))
-        sys.exit(1)
+def prompt_for_operation():
+    operation = input("🔄 \033[1;34mPlease enter the operation (encrypt/decrypt or e/d):\033[0m ").strip().lower()
+    while operation not in ["encrypt", "decrypt", "e", "d"]:
+        print("\n❌ \033[1;31mInvalid operation. Please enter 'encrypt', 'decrypt', 'e', or 'd'.\033[0m")
+        operation = input("🔄 \033[1;34mPlease enter the operation (encrypt/decrypt or e/d):\033[0m ").strip().lower()
+    return operation
 
-def check_inputfile(inputfile):
-    if not os.path.isfile(inputfile):
+def prompt_for_file():
+    inputfile = input("📄 \033[1;34mPlease enter the input file name:\033[0m ").strip()
+    while not os.path.isfile(inputfile):
         print("\n❌ \033[1;31mInput file '{}' does not exist.\033[0m".format(inputfile))
-        sys.exit(1)
+        inputfile = input("📄 \033[1;34mPlease enter the input file name:\033[0m ").strip()
+    return inputfile
 
 def loading_animation(process):
     spin = '-\\|/'
@@ -83,11 +87,21 @@ def decrypt_file(inputfile, password):
 if __name__ == "__main__":
     banner()
     password = prompt_password()
-    check_arguments()
 
-    operation = sys.argv[1]
-    inputfile = sys.argv[2]
-    check_inputfile(inputfile)
+    if len(sys.argv) < 2:
+        operation = prompt_for_operation()
+    else:
+        operation = sys.argv[1]
+
+    if operation in ["e", "encrypt"]:
+        operation = "encrypt"
+    elif operation in ["d", "decrypt"]:
+        operation = "decrypt"
+
+    if len(sys.argv) < 3:
+        inputfile = prompt_for_file()
+    else:
+        inputfile = sys.argv[2]
 
     if operation == "encrypt":
         encrypt_file(inputfile, password)
