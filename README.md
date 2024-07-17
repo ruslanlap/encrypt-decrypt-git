@@ -69,6 +69,7 @@ Encrypt a file:
 - `🔑 Enter password for AES-256-CBC encryption (or press Enter to use hardcoded): pass is hiden
 - Please enter the operation (encrypt/decrypt or e/d): e
 - Please enter the input file name: my_secret_file.txt
+
 This will encrypt the file `my_secret_file.txt` and create a new file named `my_secret_file.txt_crypt`.
 
 ## 📝 Alternative Usage 
