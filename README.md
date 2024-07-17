@@ -50,8 +50,29 @@ brew install openssl
 
 For Windows, you can download OpenSSL binaries from the official OpenSSL website [here](https://www.openssl.org).
 
-## 📝 Usage
+## 📝 Easy usage
+just follow the workflow ;)
+```sh
+./encrypt.sh
+```
+- `🔑 Enter password for AES-256-CBC encryption (or press Enter to use hardcoded): 
+- Please enter the operation (encrypt/decrypt or e/d): 
+- Please enter the input file name:
 
+## 💡 Example
+
+Encrypt a file:
+
+```sh
+./encrypt.sh
+```
+- `🔑 Enter password for AES-256-CBC encryption (or press Enter to use hardcoded): pass is hiden
+- Please enter the operation (encrypt/decrypt or e/d): e
+- Please enter the input file name: my_secret_file.txt
+This will encrypt the file `my_secret_file.txt` and create a new file named `my_secret_file.txt_crypt`.
+
+## 📝 Alternative Usage 
+add arguments after './encrypt.sh' or after 'python encrypt.py'
 ```sh
 ./encrypt.sh [encrypt|decrypt] <inputfile>
 ```

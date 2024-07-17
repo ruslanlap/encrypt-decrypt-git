@@ -1,115 +1,84 @@
-import os
-import sys
-import subprocess
-import getpass
-import time
+#!/bin/bash
 
-def get_username():
-    result = subprocess.run(['whoami'], capture_output=True, text=True)
-    return result.stdout.strip()
+# Colorful banner
+echo -e "\n\e[1;35m🔐 Encryption/Decryption Wizard 🔓\e[0m"
+echo -e "\e[1;36m====================================\e[0m\n"
 
-username = get_username()
-print(f"Hello {username}, how are you?")
+# Prompt for password or use hardcoded password
+echo -e "\e[1;34m🔑 Enter password for AES-256-CBC encryption (or press Enter to use hardcoded):\e[0m"
+read -s password
+password=${password:-"your_hardcoded_password"} # Replace with your hardcoded password
 
-def banner():
-    print("\n🔐 \033[1;35mEncryption/Decryption Wizard 🔓\033[0m")
-    print("\033[1;36m====================================\033[0m\n")
+# Prompt for operation (encrypt/decrypt or e/d)
+prompt_for_operation() {
+    read -p $'🔄 \e[1;34mPlease enter the operation (encrypt/decrypt or e/d):\e[0m ' operation
+    operation=$(echo "$operation" | tr '[:upper:]' '[:lower:]')  # Convert to lowercase
+    if [ "$operation" != "encrypt" ] && [ "$operation" != "decrypt" ] && [ "$operation" != "e" ] && [ "$operation" != "d" ]; then
+        echo -e "\n❌ \e[1;31mInvalid operation. Please enter 'encrypt', 'decrypt', 'e', or 'd'.\e[0m"
+        prompt_for_operation
+    fi
+}
+prompt_for_operation
 
-def prompt_password():
-    password = getpass.getpass("🔑 \033[1;34mEnter password for AES-256-CBC encryption (or press Enter to use hardcoded):\033[0m ")
-    return password if password else "your_hardcoded_password"  # Replace with your hardcoded password
+# Prompt for input file
+prompt_for_file() {
+    read -p $'📄 \e[1;34mPlease enter the input file name:\e[0m ' inputfile
+    if [ ! -f "$inputfile" ]; then
+        echo -e "\n❌ \e[1;31mInput file '$inputfile' does not exist.\e[0m"
+        prompt_for_file
+    fi
+}
+prompt_for_file
 
-def prompt_for_operation():
-    operation = input("🔄 \033[1;34mPlease enter the operation (encrypt/decrypt or e/d):\033[0m ").strip().lower()
-    while operation not in ["encrypt", "decrypt", "e", "d"]:
-        print("\n❌ \033[1;31mInvalid operation. Please enter 'encrypt', 'decrypt', 'e', or 'd'.\033[0m")
-        operation = input("🔄 \033[1;34mPlease enter the operation (encrypt/decrypt or e/d):\033[0m ").strip().lower()
-    return operation
+# Loading animation function
+loading_animation() {
+  spin='-\|/'
+  i=0
+  while ps a | awk '{print \$1}' | grep -q \$1; do
+    i=$(( (i+1) %4 ))
+    printf "\r${spin:$i:1}"
+    sleep .1
+  done
+  echo ""
+}
 
-def prompt_for_file():
-    inputfile = input("📄 \033[1;34mPlease enter the input file name:\033[0m ").strip()
-    while not os.path.isfile(inputfile):
-        print("\n❌ \033[1;31mInput file '{}' does not exist.\033[0m".format(inputfile))
-        inputfile = input("📄 \033[1;34mPlease enter the input file name:\033[0m ").strip()
-    return inputfile
+# Perform the encryption or decryption based on the operation
+if [ "$operation" == "encrypt" ] || [ "$operation" == "e" ]; then
+    # Extract the filename without the path
+    filename=$(basename -- "$inputfile")
 
-def loading_animation(process):
-    spin = '-\\|/'
-    i = 0
-    while process.poll() is None:
-        i = (i + 1) % 4
-        sys.stdout.write("\r" + spin[i])
-        sys.stdout.flush()
-        time.sleep(0.1)
-    print("")
+    # Derive the output file name by adding "_crypt" to the base name
+    outputfile="${filename}_crypt"
 
-def encrypt_file(inputfile, password):
-    filename = os.path.basename(inputfile)
-    outputfile = "{}_crypt".format(filename)
+    echo -e "\n\e[1;33m🔒 Encrypting file...\e[0m"
+    # Encrypt the file using OpenSSL with PBKDF2
+    (openssl enc -aes-256-cbc -salt -pbkdf2 -in "$inputfile" -out "$outputfile" -pass pass:"$password") &
+    loading_animation $!
 
-    print("\n🔒 \033[1;33mEncrypting file...\033[0m")
-    process = subprocess.Popen(
-        ["openssl", "enc", "-aes-256-cbc", "-salt", "-pbkdf2", "-in", inputfile, "-out", outputfile, "-pass", "pass:{}".format(password)],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
-    loading_animation(process)
+    if [ $? -eq 0 ]; then
+        echo -e "\n\e[1;32m✅ Encryption complete! 🎉\e[0m"
+        echo -e "\e[1;32m📁 Output file: $outputfile\e[0m"
+    else
+        echo -e "\n\e[1;31m❌ Encryption failed. 😞\e[0m"
+    fi
 
-    stdout, stderr = process.communicate()
-    if process.returncode == 0:
-        print("\n✅ \033[1;32mEncryption complete! 🎉\033[0m")
-        print("📁 \033[1;32mOutput file: {}\033[0m".format(outputfile))
-    else:
-        print("\n❌ \033[1;31mEncryption failed. 😞\033[0m\n{}".format(stderr.decode()))
+elif [ "$operation" == "decrypt" ] || [ "$operation" == "d" ]; then
+    # Check if the input file ends with "_crypt"
+    if ! [[ "$inputfile" =~ _crypt$ ]]; then
+        echo -e "\n\e[1;31m❌ Decryption failed. Input file does not end with '_crypt'. 😕\e[0m"
+        exit 1
+    fi
 
-def decrypt_file(inputfile, password):
-    if not inputfile.endswith("_crypt"):
-        print("\n❌ \033[1;31mDecryption failed. Input file does not end with '_crypt'. 😕\033[0m")
-        sys.exit(1)
+    # Derive the output file name by removing "_crypt" from the base name
+    outputfile="${inputfile%_crypt}"
 
-    outputfile = inputfile[:-6]
+    echo -e "\n\e[1;33m🔓 Decrypting file...\e[0m"
+    # Decrypt the file using OpenSSL with PBKDF2
+    (openssl enc -d -aes-256-cbc -salt -pbkdf2 -in "$inputfile" -out "$outputfile" -pass pass:"$password") &
+    loading_animation $!
 
-    print("\n🔓 \033[1;33mDecrypting file...\033[0m")
-    process = subprocess.Popen(
-        ["openssl", "enc", "-d", "-aes-256-cbc", "-salt", "-pbkdf2", "-in", inputfile, "-out", outputfile, "-pass", "pass:{}".format(password)],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
-    loading_animation(process)
-
-    stdout, stderr = process.communicate()
-    if process.returncode == 0:
-        print("\n✅ \033[1;32mDecryption complete! 🎉\033[0m")
-        print("📁 \033[1;32mOutput file: {}\033[0m".format(outputfile))
-    else:
-        print("\n❌ \033[1;31mDecryption failed. 😞\033[0m\n{}".format(stderr.decode()))
-
-if __name__ == "__main__":
-    banner()
-    password = prompt_password()
-
-    if len(sys.argv) < 2:
-        operation = prompt_for_operation()
-    else:
-        operation = sys.argv[1]
-
-    if operation in ["e", "encrypt"]:
-        operation = "encrypt"
-    elif operation in ["d", "decrypt"]:
-        operation = "decrypt"
-
-    if len(sys.argv) < 3:
-        inputfile = prompt_for_file()
-    else:
-        inputfile = sys.argv[2]
-
-    if operation == "encrypt":
-        encrypt_file(inputfile, password)
-    elif operation == "decrypt":
-        decrypt_file(inputfile, password)
-    else:
-        print("\n❌ \033[1;31mUsage: {} [encrypt|decrypt] <inputfile>\033[0m".format(sys.argv[0]))
-        sys.exit(1)
-
-    print("\n\033[1;36m====================================\033[0m")
-    print("\033[1;35m🎭 Operation completed! 🎭\033[0m\n")
+    if [ $? -eq 0 ]; then
+        echo -e "\n\e[1;32m✅ Decryption complete! 🎉\e[0m"
+        echo -e "\e[1;32m📁 Output file: $outputfile\e[0m"
+    else
+        echo -e "\n\e[1;31m
