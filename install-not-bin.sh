@@ -40,9 +40,6 @@ cp "$BINARY_NAME" "$DESTINATION_PATH"
 echo "Making '$DESTINATION_PATH' executable..."
 chmod +x "$DESTINATION_PATH"
 
-# Confirm completion
-echo "✅ Installation complete! You can now use the '$BINARY_NAME' command."
-
 # Clean up
 rm "$BINARY_NAME" checksum.sha256
 # Add ~/bin to the PATH if it's not already in the PATH
