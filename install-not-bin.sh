@@ -2,8 +2,8 @@
 
 # Define variables
 BINARY_NAME="cryptonit"
-BINARY_URL="https://github.com/ruslanlap/encrypt-decrypt-git/master/encrypt.sh"
-CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/cryptonit.sha256"
+BINARY_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/encrypt.sh"
+CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/encrypt.sh.sha256"
 DESTINATION_DIR="$HOME/bin"
 DESTINATION_PATH="$DESTINATION_DIR/$BINARY_NAME"
 
@@ -28,16 +28,13 @@ download_and_verify() {
 # Download and verify the binary
 download_and_verify
 
-# Create destination path if it doesn't exist
-mkdir -p "$DESTINATION_PATH"
-
 # Copy the binary to the destination directory
 echo "Copying '$BINARY_NAME' to '$DESTINATION_PATH'..."
 cp "$BINARY_NAME" "$DESTINATION_PATH"
 
 # Make the binary executable
-echo "Making '$DESTINATION_PATH/$BINARY_NAME' executable..."
-chmod +x "$DESTINATION_PATH/$BINARY_NAME"
+echo "Making '$DESTINATION_PATH' executable..."
+chmod +x "$DESTINATION_PATH"
 
 # Confirm completion
 echo "✅ Installation complete! You can now use the '$BINARY_NAME' command."
@@ -56,6 +53,5 @@ else
     elif [ -n "$ZSH_VERSION" ]; then
         source ~/.zshrc
     fi
-    echo "✅ PATH updated. You can now use the '$BINARY_NAME' command."
+    echo "You can now use the 'cryptonit' command."
 fi
-
