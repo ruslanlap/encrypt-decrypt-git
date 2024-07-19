@@ -5,7 +5,7 @@ BINARY_NAME="cryptonit"
 BINARY_URL="https://github.com/ruslanlap/encrypt-decrypt-git/master/encrypt.sh"
 CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/cryptonit.sha256"
 DESTINATION_DIR="$HOME/bin/cryptonit"
-DESTINATION_PATH="$DESTINATION_DIR/$BINARY_NAME"
+DESTINATION_PATH="$DESTINATION_DIR/$BINARY_NAME/"
 
 # Create destination directory if it doesn't exist
 mkdir -p "$DESTINATION_DIR"
@@ -34,7 +34,7 @@ cp "$BINARY_NAME" "$DESTINATION_PATH"
 
 # Make the binary executable
 echo "Making '$DESTINATION_PATH' executable..."
-chmod +x "$DESTINATION_PATH"
+chmod +x "DESTINATION_DIR"
 
 # Confirm completion
 echo "✅ Installation complete! You can now use the '$BINARY_NAME' command."
