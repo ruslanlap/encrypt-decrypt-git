@@ -2,10 +2,10 @@
 
 # Define variables
 BINARY_NAME="encrypt.sh"
-BINARY_URL="https://github.com/ruslanlap/encrypt-decrypt-git/releases/download/v1.0.1/cryptonit"
-CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/cryptonit.sha256"
+BINARY_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/encrypt.sh"
+CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/encrypt.sh.sha256"
 DESTINATION_DIR="$HOME/bin"
-DESTINATION_PATH="$DESTINATION_DIR/$BINARY_NAME"
+DESTINATION_PATH="$DESTINATION_DIR/cryptonit"
 
 # Create destination directory if it doesn't exist
 mkdir -p "$DESTINATION_DIR"
@@ -14,10 +14,10 @@ mkdir -p "$DESTINATION_DIR"
 download_and_verify() {
   echo "Downloading '$BINARY_NAME' from GitHub..."
   curl -o "$BINARY_NAME" -L "$BINARY_URL"
-  
+
   echo "Downloading checksum..."
   curl -o "checksum.sha256" -L "$CHECKSUM_URL"
-  
+
   echo "Verifying checksum..."
   if ! sha256sum -c checksum.sha256; then
     echo "❌ Checksum verification failed."
@@ -53,5 +53,6 @@ else
     elif [ -n "$ZSH_VERSION" ]; then
         source ~/.zshrc
     fi
-    echo "✅ Installation complete! You can now use the 'cryptonit' command."
+    echo "✅ '~/bin' added to your PATH. You can now use the 'cryptonit' command."
 fi
+
