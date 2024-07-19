@@ -9,19 +9,20 @@ DESTINATION_PATH="$DESTINATION_DIR/$BINARY_NAME"
 
 # Create destination directory if it doesn't exist
 mkdir -p "$DESTINATION_DIR"
+
 # Function to download and verify the checksum
 download_and_verify() {
   echo "Downloading '$BINARY_NAME' from GitHub..."
   curl -o "$BINARY_NAME" -L "$BINARY_URL"
   echo "Downloading checksum..."
   curl -o "checksum.sha256" -L "$CHECKSUM_URL"
-
+  
   echo "Checksum file content:"
   cat checksum.sha256
-
+  
   echo "Binary file checksum:"
   sha256sum "$BINARY_NAME"
-
+  
   echo "Verifying checksum..."
   if ! sha256sum -c checksum.sha256; then
     echo "❌ Checksum verification failed."
@@ -59,5 +60,4 @@ else
     fi
     echo "✅ Installation complete! You can now use the 'cryptonit' command."
 fi
-
 
