@@ -1,58 +1,102 @@
 #!/bin/bash
 
-# Define variables
-BINARY_NAME="encrypt.sh"
-BINARY_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/encrypt.sh"
-CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/encrypt.sh.sha256"
-DESTINATION_DIR="$HOME/bin"
-DESTINATION_PATH="$DESTINATION_DIR/$BINARY_NAME"
 
-# Create destination directory if it doesn't exist
-mkdir -p "$DESTINATION_DIR"
-# Function to download and verify the checksum
-download_and_verify() {
-  echo "Downloading '$BINARY_NAME' from GitHub..."
-  curl -o "$BINARY_NAME" -L "$BINARY_URL"
-  echo "Downloading checksum..."
-  curl -o "checksum.sha256" -L "$CHECKSUM_URL"
+# Colorful banner
+echo -e "\n\e[1;35m Encryption/Decryption Wizard \e[0m"
+echo -e "\e[1;36m====================================\e[0m\n"
+# Prompt for password or use hardcoded password
+echo -e "\e[1;34m🔑 Enter password for AES-256-CBC encryption (or press Enter to use hardcoded):\e[0m"
+read -s password
+password=${password:-"your_hardcoded_password"} # Replace with your hardcoded password
 
-  echo "Checksum file content:"
-  cat checksum.sha256
+# Check for arguments
+if [ $# -eq 2 ]; then
+  # Operation and input file provided as arguments
+  operation="$1"
+  inputfile="$2"
+else
+  # Prompt for operation (encrypt/decrypt or e/d)
+  prompt_for_operation() {
+    read -p $' \e[1;34mPlease enter the operation (encrypt/decrypt or e/d):\e[0m ' operation
+    operation=$(echo "$operation" | tr '[:upper:]' '[:lower:]') # Convert to lowercase
+    if [ "$operation" != "encrypt" ] && [ "$operation" != "decrypt" ] && [ "$operation" != "e" ] && [ "$operation" != "d" ]; then
+      echo -e "\n❌ \e[1;31mInvalid operation. Please enter 'encrypt', 'decrypt', 'e', or 'd'.\e[0m"
+      prompt_for_operation
+    fi
+  }
+  prompt_for_operation
 
-  echo "Binary file checksum:"
-  sha256sum "$BINARY_NAME"
-
-  echo "Verifying checksum..."
-  if ! sha256sum -c checksum.sha256; then
-    echo "❌ Checksum verification failed."
-    exit 1
-  fi
+  # Prompt for input file
+  prompt_for_file() {
+    read -p $' \e[1;34mPlease enter the input file name:\e[0m ' inputfile
+    if [ ! -f "$inputfile" ]; then
+      echo -e "\n❌ \e[1;31mInput file '$inputfile' does not exist.\e[0m"
+      prompt_for_file
+    fi
+  }
+  prompt_for_file
+fi
+# Loading animation function
+loading_animation() {
+  pid=$!
+  spin='-\|/'
+  i=0
+  while kill -0 $pid 2>/dev/null; do
+    i=$(( (i+1) %4 ))
+    printf "\r${spin:$i:1}"
+    sleep .1
+  done
+  echo ""
 }
 
-# Download and verify the binary
-download_and_verify
+# Perform the encryption or decryption based on the operation
+if [ "$operation" == "encrypt" ] || [ "$operation" == "e" ]; then
+    # Extract the filename without the path
+    filename=$(basename -- "$inputfile")
 
-# Copy the binary to the destination directory
-echo "Copying '$BINARY_NAME' to '$DESTINATION_PATH'..."
-cp "$BINARY_NAME" "$DESTINATION_PATH"
+    # Derive the output file name by adding "_crypt" to the base name
+    outputfile="${filename}_crypt"
 
-# Make the binary executable
-echo "Making '$DESTINATION_PATH' executable..."
-chmod +x "$DESTINATION_PATH"
+ echo -e "\n\e[1;33m🔒 Encrypting file...\e[0m"
+ # Encrypt the file using OpenSSL with PBKDF2
+ (openssl enc -aes-256-cbc -salt -pbkdf2 -in "$inputfile" -out "$outputfile" -pass pass:"$password") &
+ loading_animation
 
-# Clean up
-rm "$BINARY_NAME" checksum.sha256
-# Add ~/bin to the PATH if it's not already in the PATH
-#if echo "$PATH" | grep -q "$HOME/bin"; then
-    #echo "~/bin is already in your PATH."
-#else
-    echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
-    echo 'export PATH="$HOME/bin:$PATH"' >> ~/.zshrc
-    if [ -n "$BASH_VERSION" ]; then
-        source ~/.bashrc
-    elif [ -n "$ZSH_VERSION" ]; then
-        source ~/.zshrc
+    if [ $? -eq 0 ]; then
+        echo -e "\n\e[1;32m✅ Encryption complete! 🎉\e[0m"
+        echo -e "\e[1;32m📁 Output file: $outputfile\e[0m"
+    else
+        echo -e "\n\e[1;31m❌ Encryption failed. 😞\e[0m"
     fi
-    echo "✅ Installation complete! You can now use the 'cryptonit' command."
-#fi
 
+elif [ "$operation" == "decrypt" ] || [ "$operation" == "d" ]; then
+    # Check if the input file ends with "_crypt"
+    if ! [[ "$inputfile" =~ _crypt$ ]]; then
+        echo -e "\n\e[1;31m❌ Decryption failed. Input file does not end with '_crypt'. 😕\e[0m"
+        exit 1
+    fi
+
+    # Derive the output file name by removing "_crypt" from the base name
+    outputfile="${inputfile%_crypt}"
+
+    echo -e "\n\e[1;33m🔓 Decrypting file...\e[0m"
+    # Decrypt the file using OpenSSL with PBKDF2
+    (openssl enc -d -aes-256-cbc -salt -pbkdf2 -in "$inputfile" -out "$outputfile" -pass pass:"$password") &
+
+    if [ $? -eq 0 ]; then
+        echo -e "\n\e[1;32m✅ Decryption complete! 🎉\e[0m"
+        echo -e "\e[1;32m📁 Output file: $outputfile\e[0m"
+    else
+   echo -e "\n\e[1;31m❌ Decryption failed. 😞\e[0m"
+ fi
+
+else
+ echo -e "\n\e[1;31m❌ Usage: $0 [encrypt|decrypt] <inputfile>\e[0m"
+ exit 1
+fi
+
+# Clear the password variable for security
+unset password
+
+echo -e "\n\e[1;36m====================================\e[0m"
+echo -e "\e[1;35m🎭 Operation completed! 🎭\e[0m\n"

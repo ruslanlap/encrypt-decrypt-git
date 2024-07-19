@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define variables
-BINARY_NAME="cryptonit"
+BINARY_NAME="encrypt.sh"
 BINARY_URL="https://github.com/ruslanlap/encrypt-decrypt-git/releases/download/v1.0.1/cryptonit"
 CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/cryptonit.sha256"
 DESTINATION_DIR="$HOME/bin"
