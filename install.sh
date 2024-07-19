@@ -47,7 +47,6 @@ if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
     echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
     echo 'export PATH="$HOME/bin:$PATH"' >> ~/.zshrc
     source ~/.bashrc || source ~/.zshrc
-    echo "~/bin has been added to your PATH. Please restart your terminal or run 'source ~/.bashrc' or 'source ~/.zshrc'."
 else
     echo "~/bin is already in your PATH."
 fi
