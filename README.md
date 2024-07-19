@@ -6,6 +6,7 @@ This script provides a simple yet secure method to encrypt and decrypt files usi
 
 - [⭐ Features](#-features)
 - [📦 Requirements](#-requirements)
+- [Quick instal](#-quick-install)
 - [⚙️ Installation](#installation)
 - [📝 Usage](#-usage)
 - [💡 Example](#-example)
@@ -25,6 +26,12 @@ This script provides a simple yet secure method to encrypt and decrypt files usi
 
 - Bash shell
 - OpenSSL library
+
+## Quick install
+use only one command for install 'cryptonit' bin file
+```sh
+curl -sSL https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/install.sh | sh
+```
 
 ## ⚙️ Installation
 
