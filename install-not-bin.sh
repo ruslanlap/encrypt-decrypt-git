@@ -14,7 +14,6 @@ mkdir -p "$DESTINATION_DIR"
 download_and_verify() {
   echo "Downloading '$BINARY_NAME' from GitHub..."
   curl -o "$BINARY_NAME" -L "$BINARY_URL"
-  
   echo "Downloading checksum..."
   curl -o "checksum.sha256" -L "$CHECKSUM_URL"
   
@@ -55,3 +54,4 @@ else
     fi
     echo "✅ Installation complete! You can now use the 'cryptonit' command."
 fi
+
