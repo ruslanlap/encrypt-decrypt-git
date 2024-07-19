@@ -4,7 +4,7 @@
 BINARY_NAME="cryptonit"
 BINARY_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/cryptonit"
 CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/cryptonit.sha256"
-DESTINATION_DIR="~/bin"
+DESTINATION_DIR="$HOME/bin"
 DESTINATION_PATH="$DESTINATION_DIR/$BINARY_NAME"
 
 # Create destination directory if it doesn't exist
