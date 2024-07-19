@@ -32,7 +32,10 @@ use only one command for install 'cryptonit' bin file
 ```sh
 curl -sSL https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/install.sh | sh
 ```
-
+Othet way is:
+```sh
+curl -sSL https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/install-not-bin.sh | sh
+```
 ## ⚙️ Installation
 
 To use this script, ensure you have OpenSSL installed on your system. If you don't have it installed, you can typically install it using your system's package manager. Here are some examples:
