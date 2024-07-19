@@ -43,11 +43,15 @@ echo "✅ Installation complete! You can now use the '$BINARY_NAME' command."
 rm "$BINARY_NAME" checksum.sha256
 
 # Add ~/bin to the PATH if it's not already in the PATH
-if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
+if echo "$PATH" | grep -q "$HOME/bin"; then
+    echo "~/bin is already in your PATH."
+else
     echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
     echo 'export PATH="$HOME/bin:$PATH"' >> ~/.zshrc
-    source ~/.bashrc || source ~/.zshrc
-else
-    echo "~/bin is already in your PATH."
+    if [ -n "$BASH_VERSION" ]; then
+        source ~/.bashrc
+    elif [ -n "$ZSH_VERSION" ]; then
+        source ~/.zshrc
+    fi
+    echo "✅ Installation complete! You can now use the 'cryptonit' command."
 fi
-
