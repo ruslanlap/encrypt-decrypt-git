@@ -4,26 +4,6 @@
 BINARY_NAME="encrypt.sh"
 BINARY_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/encrypt.sh"
 CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/encrypt.sh.sha256"
-DESTINATION_DIR="$HOME/bin"
-DESTINATION_PATH="$DESTINATION_DIR/$BINARY_NAME"
-
-# Create destination directory if it doesn't exist
-mkdir -p "$DESTINATION_DIR"
-# Function to download and verify the checksum
-download_and_verify() {
-  echo "Downloading '$BINARY_NAME' from GitHub..."
-  curl -o "$BINARY_NAME" -L "$BINARY_URL"
-  echo "Downloading checksum..."
-  curl -o "checksum.sha256" -L "$CHECKSUM_URL"
-
-  echo "Checksum file content:"
-  cat checksum.sha256
-#!/bin/bash
-
-# Define variables
-BINARY_NAME="encrypt.sh"
-BINARY_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/encrypt.sh"
-CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/encrypt.sh.sha256"
 DESTINATION_DIR="$HOME/bin/cryptonit"
 DESTINATION_PATH="$DESTINATION_DIR/$BINARY_NAME"
 
