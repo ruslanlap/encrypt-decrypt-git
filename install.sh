@@ -2,29 +2,21 @@
 
 # Define variables
 BINARY_NAME="cryptonit"
-BINARY_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/cryptonit"
-CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/cryptonit.sha256"
+BINARY_URL="https://github.com/ruslanlap/encrypt-decrypt-git/releases/download/v1.0.1/cryptonit"
+CHECKSUM_URL="https://github.com/ruslanlap/encrypt-decrypt-git/releases/download/v1.0.1/cryptonit.sha256"
 DESTINATION_DIR="$HOME/bin"
 DESTINATION_PATH="$DESTINATION_DIR/$BINARY_NAME"
 
 # Create destination directory if it doesn't exist
 mkdir -p "$DESTINATION_DIR"
 
-# Check if ~/bin directory exists and create it if it doesn't
-if [ -d "$DESTINATION_DIR" ]; then
-    echo "~/bin directory already exists."
-else
-    echo "Creating ~/bin directory..."
-    mkdir -p "$DESTINATION_DIR"
-fi
-
 # Function to download and verify the checksum
 download_and_verify() {
   echo "Downloading '$BINARY_NAME' from GitHub..."
-  curl -o "$BINARY_NAME" "$BINARY_URL"
+  curl -o "$BINARY_NAME" -L "$BINARY_URL"
   
   echo "Downloading checksum..."
-  curl -o "checksum.sha256" "$CHECKSUM_URL"
+  curl -o "checksum.sha256" -L "$CHECKSUM_URL"
   
   echo "Verifying checksum..."
   sha256sum -c checksum.sha256
@@ -55,8 +47,8 @@ rm "$BINARY_NAME" checksum.sha256
 if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
     echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
     echo 'export PATH="$HOME/bin:$PATH"' >> ~/.zshrc
-    source ~/.bashrc || source ~/.zshrc
     echo "~/bin has been added to your PATH. Please restart your terminal or run 'source ~/.bashrc' or 'source ~/.zshrc'."
 else
     echo "~/bin is already in your PATH."
 fi
+
