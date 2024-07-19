@@ -53,5 +53,5 @@ else
     elif [ -n "$ZSH_VERSION" ]; then
         source ~/.zshrc
     fi
-    echo "You can now use the 'cryptonit' command."
+    echo "✅ Installation complete! You can now use the 'cryptonit' command."
 fi
