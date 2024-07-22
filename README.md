@@ -1,4 +1,7 @@
-# 🔒 AES-256-CBC Encryption/Decryption Script 🔓
+# CRYPTONIT 🔓
+## 🔒 AES-256-CBC Encryption/Decryption Script 🔓
+
+
 
 This script provides a simple yet secure method to encrypt and decrypt files using the AES-256-CBC algorithm with password protection.
 
@@ -29,10 +32,6 @@ This script provides a simple yet secure method to encrypt and decrypt files usi
 
 ## Quick install
 use only one command for install 'cryptonit' bin file
-```sh
-curl -sSL https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/install.sh | sh
-```
-Othet way is:
 ```sh
 curl -sSL https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/install-not-bin.sh | sh
 ```
