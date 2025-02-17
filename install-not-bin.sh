@@ -2,12 +2,14 @@
 
 # Define variables
 SCRIPT_NAME="encrypt.sh"
-SCRIPT_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/main/encrypt.sh"
-PYTHON_SCRIPT_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/main/encrypt.py"
-CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/main/encrypt.sh.sha256"
+SCRIPT_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/master/encrypt.sh"
+PYTHON_SCRIPT_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/master/encrypt.py"
+CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/master/encrypt.sh.sha256"
 DESTINATION_DIR="$HOME/bin"
 DESTINATION_PATH="$DESTINATION_DIR/cryptonit"
 
+# Expected checksum for encrypt.sh
+EXPECTED_CHECKSUM="09199de6444867dd92864d3734fd4544ca18fe8122f494d183a3b0a1998e1af9"
 
 # Color codes for terminal output
 GREEN='\033[0;32m'
@@ -35,7 +37,27 @@ create_bin_dir() {
     fi
 }
 
-# Function to download and verify the checksum with progress animation
+# Function to verify checksum
+verify_checksum() {
+    local file=$1
+    local expected=$2
+    local computed=$(sha256sum "$file" | cut -d' ' -f1)
+    
+    echo -e "${BLUE}Verifying checksum for $file...${NC}"
+    echo -e "${BLUE}Computed checksum: $computed${NC}"
+    echo -e "${BLUE}Expected checksum: $expected${NC}"
+    
+    if [ "$computed" != "$expected" ]; then
+        echo -e "${RED}❌ Checksum verification failed!${NC}"
+        echo -e "${RED}Security Error: The downloaded file may have been tampered with.${NC}"
+        echo -e "${RED}Installation aborted for security reasons.${NC}"
+        rm -f "$file"
+        exit 1
+    fi
+    echo -e "${GREEN}✅ Checksum verification successful!${NC}"
+}
+
+# Function to download and verify files
 download_files() {
     echo -e "${BLUE}Downloading '$SCRIPT_NAME'...${NC}"
     if ! curl -sSLo "$SCRIPT_NAME" "$SCRIPT_URL"; then
@@ -43,6 +65,9 @@ download_files() {
         exit 1
     fi
     echo -e "${GREEN}Download complete!${NC}"
+    
+    # Verify encrypt.sh checksum
+    verify_checksum "$SCRIPT_NAME" "$EXPECTED_CHECKSUM"
 
     echo -e "${BLUE}Downloading encrypt.py...${NC}"
     if ! curl -sSLo "encrypt.py" "$PYTHON_SCRIPT_URL"; then
@@ -50,31 +75,6 @@ download_files() {
         exit 1
     fi
     echo -e "${GREEN}Download complete!${NC}"
-
-    # Calculate checksum of downloaded file
-    local computed_checksum=$(sha256sum "$SCRIPT_NAME" | cut -d' ' -f1)
-    echo -e "${BLUE}Computed checksum: $computed_checksum${NC}"
-    
-    # Download and verify checksum
-    echo -e "${BLUE}Downloading checksum...${NC}"
-    if ! curl -sSLo "checksum.sha256" "$CHECKSUM_URL"; then
-        echo -e "${RED}Failed to download checksum${NC}"
-        exit 1
-    fi
-    
-    # Extract expected checksum
-    local expected_checksum=$(cat checksum.sha256 | cut -d' ' -f1)
-    echo -e "${BLUE}Expected checksum: $expected_checksum${NC}"
-
-    # Compare checksums
-    if [ "$computed_checksum" != "$expected_checksum" ]; then
-        echo -e "${RED}❌ Checksum verification failed${NC}"
-        echo -e "${RED}Expected: $expected_checksum${NC}"
-        echo -e "${RED}Got: $computed_checksum${NC}"
-        echo -e "${BLUE}Continuing with installation anyway...${NC}"
-    else
-        echo -e "${GREEN}✅ Checksum verification successful!${NC}"
-    fi
 }
 
 # Install the scripts
@@ -84,11 +84,8 @@ install_scripts() {
     # Copy encrypt.py to bin directory
     cp "encrypt.py" "$DESTINATION_DIR/encrypt.py"
     
-    # Create the cryptonit wrapper script
-    cat > "$DESTINATION_PATH" << 'EOF'
-#!/bin/bash
-python3 "$HOME/bin/encrypt.py" "$@"
-EOF
+    # Copy encrypt.sh and make it the cryptonit command
+    cp "$SCRIPT_NAME" "$DESTINATION_PATH"
     
     # Make scripts executable
     chmod +x "$DESTINATION_PATH"
@@ -124,7 +121,7 @@ update_path() {
 
 # Cleanup temporary files
 cleanup() {
-    rm -f "$SCRIPT_NAME" "checksum.sha256" "encrypt.py"
+    rm -f "$SCRIPT_NAME" "encrypt.py"
 }
 
 # Main installation process
