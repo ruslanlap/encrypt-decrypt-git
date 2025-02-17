@@ -37,7 +37,7 @@ echo "Making '$DESTINATION_PATH' executable..."
 chmod +x "$DESTINATION_PATH"
 
 # Confirm completion
-echo "✅ Installation complete! You can now use the '$BINARY_NAME' command."
+"echo "✅ Installation complete! You can now use the **cryptonit** command."
 
 # Clean up
 rm "$BINARY_NAME" checksum.sha256

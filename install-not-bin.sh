@@ -37,22 +37,21 @@ echo "Making '$DESTINATION_PATH' executable..."
 chmod +x "$DESTINATION_PATH"
 
 # Confirm completion
-echo "✅ Installation complete! You can now use the '$BINARY_NAME' command."
+echo "✅ Installation complete! You can now use the cryptonit command."
 
 # Clean up
 rm "$BINARY_NAME" checksum.sha256
 
 # Add ~/bin to the PATH if it's not already in the PATH
 if echo "$PATH" | grep -q "$HOME/bin"; then
-    echo "~/bin is already in your PATH."
+  echo "~/bin is already in your PATH."
 else
-    echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
-    echo 'export PATH="$HOME/bin:$PATH"' >> ~/.zshrc
-    if [ -n "$BASH_VERSION" ]; then
-        source ~/.bashrc
-    elif [ -n "$ZSH_VERSION" ]; then
-        source ~/.zshrc
-    fi
-    echo "✅ '~/bin' added to your PATH. You can now use the 'cryptonit' command."
+  echo 'export PATH="$HOME/bin:$PATH"' >>~/.bashrc
+  echo 'export PATH="$HOME/bin:$PATH"' >>~/.zshrc
+  if [ -n "$BASH_VERSION" ]; then
+    source ~/.bashrc
+  elif [ -n "$ZSH_VERSION" ]; then
+    source ~/.zshrc
+  fi
+  echo "✅ '~/bin' added to your PATH. You can now use the 'cryptonit' command."
 fi
-

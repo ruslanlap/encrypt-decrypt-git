@@ -62,7 +62,7 @@ For Windows, you can download OpenSSL binaries from the official OpenSSL website
 ## 📝 Easy usage
 just follow the workflow ;)
 ```sh
-./encrypt.sh
+cryptonit
 ```
 - `🔑 Enter password for AES-256-CBC encryption (or press Enter to use hardcoded): 
 - Please enter the operation (encrypt/decrypt or e/d): 
@@ -73,7 +73,7 @@ just follow the workflow ;)
 Encrypt a file:
 
 ```sh
-./encrypt.sh
+use cryponit or ./encrypt.sh
 ```
 - `🔑 Enter password for AES-256-CBC encryption (or press Enter to use hardcoded): pass is hiden
 - Please enter the operation (encrypt/decrypt or e/d): e
