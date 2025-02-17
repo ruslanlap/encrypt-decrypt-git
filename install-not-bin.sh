@@ -2,9 +2,9 @@
 
 # Define variables
 SCRIPT_NAME="encrypt.sh"
-SCRIPT_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/master/encrypt.sh"
-PYTHON_SCRIPT_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/master/encrypt.py"
-CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/master/encrypt.sh.sha256"
+SCRIPT_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/main/encrypt.sh"
+PYTHON_SCRIPT_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/main/encrypt.py"
+CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/main/encrypt.sh.sha256"
 DESTINATION_DIR="$HOME/bin"
 DESTINATION_PATH="$DESTINATION_DIR/cryptonit"
 
