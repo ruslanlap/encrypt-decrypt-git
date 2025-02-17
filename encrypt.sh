@@ -35,29 +35,30 @@ get_operation() {
 # Function to get input file from user
 get_input_file() {
     local op=$1
-    local file=""
-    while true; do
+    local input_file=""
+    
+    while [ -z "$input_file" ]; do
         read -p "Enter path to file to $op: " input
         if [ -z "$input" ]; then
             echo "Error: Please enter a file path"
             continue
         fi
         
-        # Expand the path (handle ~, etc.)
-        file=$(eval echo "$input")
+        # Replace ~ with $HOME
+        input="${input/#\~/$HOME}"
         
-        if [ -f "$file" ]; then
-            # For decryption, check if file ends with _crypt
-            if [ "$op" = "decrypt" ] && [[ "$file" != *"_crypt" ]]; then
+        if [ -f "$input" ]; then
+            if [ "$op" = "decrypt" ] && [[ "$input" != *"_crypt" ]]; then
                 echo "Error: Decryption input file must end with '_crypt'"
                 continue
             fi
-            echo "$file"
-            break
+            input_file="$input"
         else
-            echo "Error: File '$file' does not exist"
+            echo "Error: File '$input' does not exist"
         fi
     done
+    
+    echo "$input_file"
 }
 
 # Interactive or command line mode
@@ -104,7 +105,7 @@ echo
 
 # Perform operation
 if [ "$operation" = "encrypt" ]; then
-    openssl enc -aes-256-cbc -salt -pbkdf2 -in "$input_file" -out "$output_file" -pass "pass:$password"
+    openssl enc -aes-256-cbc -salt -pbkdf2 -in "${input_file}" -out "${output_file}" -pass "pass:$password"
     if [ $? -eq 0 ]; then
         echo "File encrypted successfully: $output_file"
     else
@@ -112,7 +113,7 @@ if [ "$operation" = "encrypt" ]; then
         exit 1
     fi
 else
-    openssl enc -d -aes-256-cbc -salt -pbkdf2 -in "$input_file" -out "$output_file" -pass "pass:$password"
+    openssl enc -d -aes-256-cbc -salt -pbkdf2 -in "${input_file}" -out "${output_file}" -pass "pass:$password"
     if [ $? -eq 0 ]; then
         echo "File decrypted successfully: $output_file"
     else
