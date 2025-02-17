@@ -72,8 +72,8 @@ else
   echo -e "${GREEN}✅ '~/bin' added to your PATH. You can now use the 'cryptonit' command.${NC}"
 fi
 
-read -p "Would you like a tip on how to use cryptonit? (y/n) " answer
-if [[ "$answer" =~ ^[Yy] ]]; then
+read answer
+if [[ $answer == [Yy]* ]]; then
   echo -e "${GREEN}Tip: Use 'cryptonit -h' to see available options and how to encrypt or decrypt files!${NC}"
 else
   echo -e "${BLUE}Maybe next time!${NC}"
