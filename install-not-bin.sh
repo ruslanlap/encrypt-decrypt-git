@@ -72,7 +72,6 @@ else
   echo -e "${GREEN}✅ '~/bin' added to your PATH. You can now use the 'cryptonit' command.${NC}"
 fi
 
-# Add some fun interactive elements
 echo -e "${BLUE}Would you like a tip on how to use cryptonit? (y/n)${NC}"
 read answer
 if [[ $answer == [Yy]* ]]; then
