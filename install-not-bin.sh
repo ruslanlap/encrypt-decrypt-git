@@ -2,8 +2,8 @@
 
 # Define variables
 BINARY_NAME="encrypt.sh"
-BINARY_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/encrypt.sh"
-CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/master/encrypt.sh.sha256"
+BINARY_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/master/encrypt.sh"
+CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/master/encrypt.sh.sha256"
 DESTINATION_DIR="$HOME/bin"
 DESTINATION_PATH="$DESTINATION_DIR/cryptonit"
 
