@@ -3,8 +3,6 @@
 # Define variables
 SCRIPT_NAME="encrypt.sh"
 SCRIPT_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/master/encrypt.sh"
-PYTHON_SCRIPT_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/master/encrypt.py"
-CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/master/encrypt.sh.sha256"
 DESTINATION_DIR="$HOME/bin"
 DESTINATION_PATH="$DESTINATION_DIR/cryptonit"
 
@@ -68,28 +66,17 @@ download_files() {
     
     # Verify encrypt.sh checksum
     verify_checksum "$SCRIPT_NAME" "$EXPECTED_CHECKSUM"
-
-    echo -e "${BLUE}Downloading encrypt.py...${NC}"
-    if ! curl -sSLo "encrypt.py" "$PYTHON_SCRIPT_URL"; then
-        echo -e "${RED}Failed to download encrypt.py${NC}"
-        exit 1
-    fi
-    echo -e "${GREEN}Download complete!${NC}"
 }
 
 # Install the scripts
 install_scripts() {
     echo -e "${BLUE}Installing scripts to $DESTINATION_DIR...${NC}"
     
-    # Copy encrypt.py to bin directory
-    cp "encrypt.py" "$DESTINATION_DIR/encrypt.py"
-    
-    # Copy encrypt.sh and make it the cryptonit command
+    # Copy encrypt.sh as cryptonit
     cp "$SCRIPT_NAME" "$DESTINATION_PATH"
     
-    # Make scripts executable
+    # Make script executable
     chmod +x "$DESTINATION_PATH"
-    chmod +x "$DESTINATION_DIR/encrypt.py"
     
     echo -e "${GREEN}✅ Installation successful!${NC}"
 }
@@ -121,7 +108,7 @@ update_path() {
 
 # Cleanup temporary files
 cleanup() {
-    rm -f "$SCRIPT_NAME" "encrypt.py"
+    rm -f "$SCRIPT_NAME"
 }
 
 # Main installation process
@@ -139,6 +126,8 @@ main() {
     echo -e "${BLUE}Usage:${NC}"
     echo "1. Restart your terminal or run: source ~/.bashrc"
     echo "2. Run 'cryptonit' to start the encryption/decryption tool"
+    echo "   Example: cryptonit encrypt secret.txt"
+    echo "   Example: cryptonit decrypt secret.txt_crypt"
 }
 
 # Run main installation
