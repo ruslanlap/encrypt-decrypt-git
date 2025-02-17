@@ -55,9 +55,6 @@ chmod +x "$DESTINATION_PATH"
 # Confirm completion
 echo -e "${GREEN}✅ Installation complete! You can now use the **cryptonit** command.${NC}"
 
-# Clean up
-rm "$BINARY_NAME" checksum.sha256
-
 # Add ~/bin to the PATH if it's not already in the PATH
 if echo "$PATH" | grep -q "$HOME/bin"; then
   echo -e "${BLUE}~/bin is already in your PATH.${NC}"

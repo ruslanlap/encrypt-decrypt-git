@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 
 # Define variables
 BINARY_NAME="encrypt.sh"
