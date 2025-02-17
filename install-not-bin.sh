@@ -8,6 +8,7 @@ CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-py
 DESTINATION_DIR="$HOME/bin"
 DESTINATION_PATH="$DESTINATION_DIR/cryptonit"
 
+
 # Color codes for terminal output
 GREEN='\033[0;32m'
 RED='\033[0;31m'

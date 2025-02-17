@@ -7,7 +7,6 @@ CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git/ma
 DESTINATION_DIR="$HOME/bin"
 DESTINATION_PATH="$DESTINATION_DIR/$BINARY_NAME"
 
-# Create destination directory if it doesn't exist
 mkdir -p "$DESTINATION_DIR"
 
 # Function to download and verify the checksum
