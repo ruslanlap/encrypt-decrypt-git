@@ -35,8 +35,17 @@ get_operation() {
 # Function to get input file from user
 get_input_file() {
     local op=$1
+    local file=""
     while true; do
-        read -p "Enter path to file to $op: " file
+        read -p "Enter path to file to $op: " input
+        if [ -z "$input" ]; then
+            echo "Error: Please enter a file path"
+            continue
+        fi
+        
+        # Expand the path (handle ~, etc.)
+        file=$(eval echo "$input")
+        
         if [ -f "$file" ]; then
             # For decryption, check if file ends with _crypt
             if [ "$op" = "decrypt" ] && [[ "$file" != *"_crypt" ]]; then
@@ -44,7 +53,7 @@ get_input_file() {
                 continue
             fi
             echo "$file"
-            return
+            break
         else
             echo "Error: File '$file' does not exist"
         fi
