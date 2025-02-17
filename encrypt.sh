@@ -10,42 +10,76 @@ if ! command -v openssl &> /dev/null; then
     exit 1
 fi
 
-# Get the directory where the script is located
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-
 # Function to show usage
 show_usage() {
     echo "Usage: $0 [encrypt|decrypt] <file>"
+    echo "Or run without arguments for interactive mode"
     echo "Examples:"
     echo "  $0 encrypt secret.txt"
     echo "  $0 decrypt secret.txt_crypt"
     exit 1
 }
 
-# Check arguments
-if [ $# -ne 2 ]; then
+# Function to get operation from user
+get_operation() {
+    while true; do
+        read -p "Choose operation (encrypt/decrypt) [e/d]: " op
+        case $op in
+            [Ee]* ) echo "encrypt"; return;;
+            [Dd]* ) echo "decrypt"; return;;
+            * ) echo "Please answer encrypt(e) or decrypt(d)";;
+        esac
+    done
+}
+
+# Function to get input file from user
+get_input_file() {
+    local op=$1
+    while true; do
+        read -p "Enter path to file to $op: " file
+        if [ -f "$file" ]; then
+            # For decryption, check if file ends with _crypt
+            if [ "$op" = "decrypt" ] && [[ "$file" != *"_crypt" ]]; then
+                echo "Error: Decryption input file must end with '_crypt'"
+                continue
+            fi
+            echo "$file"
+            return
+        else
+            echo "Error: File '$file' does not exist"
+        fi
+    done
+}
+
+# Interactive or command line mode
+if [ $# -eq 0 ]; then
+    # Interactive mode
+    operation=$(get_operation)
+    input_file=$(get_input_file "$operation")
+elif [ $# -eq 2 ]; then
+    # Command line mode
+    operation=$1
+    input_file=$2
+    
+    # Validate operation
+    if [[ "$operation" != "encrypt" && "$operation" != "decrypt" ]]; then
+        echo "Invalid operation. Use 'encrypt' or 'decrypt'"
+        show_usage
+    fi
+    
+    # Check if input file exists
+    if [ ! -f "$input_file" ]; then
+        echo "Error: Input file '$input_file' does not exist"
+        exit 1
+    fi
+    
+    # For decryption, check if file ends with _crypt
+    if [ "$operation" = "decrypt" ] && [[ "$input_file" != *"_crypt" ]]; then
+        echo "Error: Decryption input file must end with '_crypt'"
+        exit 1
+    fi
+else
     show_usage
-fi
-
-operation=$1
-input_file=$2
-
-# Validate operation
-if [[ "$operation" != "encrypt" && "$operation" != "decrypt" ]]; then
-    echo "Invalid operation. Use 'encrypt' or 'decrypt'"
-    show_usage
-fi
-
-# Check if input file exists
-if [ ! -f "$input_file" ]; then
-    echo "Error: Input file '$input_file' does not exist"
-    exit 1
-fi
-
-# For decryption, check if file ends with _crypt
-if [ "$operation" = "decrypt" ] && [[ "$input_file" != *"_crypt" ]]; then
-    echo "Error: Decryption input file must end with '_crypt'"
-    exit 1
 fi
 
 # Set output filename
