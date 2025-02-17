@@ -6,8 +6,8 @@ SCRIPT_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-pyth
 DESTINATION_DIR="$HOME/bin"
 DESTINATION_PATH="$DESTINATION_DIR/cryptonit"
 
-# Expected checksum for encrypt.sh (updated for interactive version with path handling)
-EXPECTED_CHECKSUM="f6d4f5e8e419b6ea31d8949547c98d7d2aa7c5d8a4f1c4f94c3d6c8b7a9e0f2"
+# Expected checksum for encrypt.sh (updated for improved path handling)
+EXPECTED_CHECKSUM="29ace8047bdc9dddba5e6f2458e8b653a2e8e1c2f36c5e4c359dd05081421cbe"
 
 # Color codes for terminal output
 GREEN='\033[0;32m'
