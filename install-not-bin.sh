@@ -35,7 +35,6 @@ create_bin_dir() {
     fi
 }
 
-# Function to verify checksum
 verify_checksum() {
     local file=$1
     local expected=$2
