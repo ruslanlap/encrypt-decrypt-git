@@ -6,8 +6,11 @@ import time
 
 
 def get_username():
-    result = subprocess.run(["whoami"], capture_output=True, text=True)
-    return result.stdout.strip()
+    try:
+        import getpass
+        return getpass.getuser()
+    except:
+        return "User"
 
 
 username = get_username()
@@ -52,15 +55,15 @@ def prompt_for_operation():
 
 def prompt_for_file():
     inputfile = input("📄 \033[1;34mPlease enter the input file name:\033[0m ").strip()
-    # Розширюємо тільду ~ до /home/користувач
-    inputfile = os.path.expanduser(inputfile)
+    # Handle Windows paths correctly
+    inputfile = os.path.abspath(os.path.expanduser(inputfile))
 
     while not os.path.isfile(inputfile):
         print("\n❌ \033[1;31mInput file '{}' does not exist.\033[0m".format(inputfile))
         inputfile = input(
             "📄 \033[1;34mPlease enter the input file name:\033[0m "
         ).strip()
-        inputfile = os.path.expanduser(inputfile)
+        inputfile = os.path.abspath(os.path.expanduser(inputfile))
     return inputfile
 
 
@@ -77,72 +80,95 @@ def loading_animation(process):
 
 def encrypt_file(inputfile, password):
     filename = os.path.basename(inputfile)
-    outputfile = "{}_crypt".format(filename)
+    directory = os.path.dirname(inputfile)
+    outputfile = os.path.join(directory, "{}_crypt".format(filename))
 
     print("\n🔒 \033[1;33mEncrypting file...\033[0m")
-    process = subprocess.Popen(
-        [
-            "openssl",
-            "enc",
-            "-aes-256-cbc",
-            "-salt",
-            "-pbkdf2",
-            "-in",
-            inputfile,
-            "-out",
-            outputfile,
-            "-pass",
-            "pass:{}".format(password),
-        ],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    loading_animation(process)
-
-    stdout, stderr = process.communicate()
-    if process.returncode == 0:
-        print("\n✅ \033[1;32mEncryption complete! 🎉\033[0m")
-        print("📁 \033[1;32mOutput file: {}\033[0m".format(outputfile))
-    else:
-        print("\n❌ \033[1;31mEncryption failed. 😞\033[0m\n{}".format(stderr.decode()))
+    try:
+        process = subprocess.Popen(
+            [
+                "openssl",
+                "enc",
+                "-aes-256-cbc",
+                "-salt",
+                "-pbkdf2",
+                "-in",
+                inputfile,
+                "-out",
+                outputfile,
+                "-pass",
+                "pass:{}".format(password),
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=True  # Required for Windows
+        )
+        loading_animation(process)
+        _, stderr = process.communicate()
+        
+        if process.returncode != 0:
+            print("\n❌ \033[1;31mEncryption failed: {}\033[0m".format(stderr.decode()))
+            if os.path.exists(outputfile):
+                os.remove(outputfile)
+            return False
+        
+        print("\n✅ \033[1;32mFile encrypted successfully!\033[0m")
+        print("📁 Output file: {}".format(outputfile))
+        return True
+    except Exception as e:
+        print("\n❌ \033[1;31mError during encryption: {}\033[0m".format(str(e)))
+        if os.path.exists(outputfile):
+            os.remove(outputfile)
+        return False
 
 
 def decrypt_file(inputfile, password):
     if not inputfile.endswith("_crypt"):
-        print(
-            "\n❌ \033[1;31mDecryption failed. Input file does not end with '_crypt'. 😕\033[0m"
-        )
-        sys.exit(1)
+        print("\n❌ \033[1;31mError: Input file must end with '_crypt' for decryption.\033[0m")
+        return False
 
-    outputfile = inputfile[:-6]
+    filename = os.path.basename(inputfile)
+    directory = os.path.dirname(inputfile)
+    outputfile = os.path.join(directory, filename.replace("_crypt", ""))
 
     print("\n🔓 \033[1;33mDecrypting file...\033[0m")
-    process = subprocess.Popen(
-        [
-            "openssl",
-            "enc",
-            "-d",
-            "-aes-256-cbc",
-            "-salt",
-            "-pbkdf2",
-            "-in",
-            inputfile,
-            "-out",
-            outputfile,
-            "-pass",
-            "pass:{}".format(password),
-        ],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    loading_animation(process)
-
-    stdout, stderr = process.communicate()
-    if process.returncode == 0:
-        print("\n✅ \033[1;32mDecryption complete! 🎉\033[0m")
-        print("📁 \033[1;32mOutput file: {}\033[0m".format(outputfile))
-    else:
-        print("\n❌ \033[1;31mDecryption failed. 😞\033[0m\n{}".format(stderr.decode()))
+    try:
+        process = subprocess.Popen(
+            [
+                "openssl",
+                "enc",
+                "-aes-256-cbc",
+                "-d",
+                "-salt",
+                "-pbkdf2",
+                "-in",
+                inputfile,
+                "-out",
+                outputfile,
+                "-pass",
+                "pass:{}".format(password),
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=True  # Required for Windows
+        )
+        loading_animation(process)
+        _, stderr = process.communicate()
+        
+        if process.returncode != 0:
+            print("\n❌ \033[1;31mDecryption failed: {}\033[0m".format(stderr.decode()))
+            if os.path.exists(outputfile):
+                os.remove(outputfile)
+            return False
+        
+        print("\n✅ \033[1;32mFile decrypted successfully!\033[0m")
+        print("📁 Output file: {}".format(outputfile))
+        return True
+    except Exception as e:
+        print("\n❌ \033[1;31mError during decryption: {}\033[0m".format(str(e)))
+        if os.path.exists(outputfile):
+            os.remove(outputfile)
+        return False
 
 
 if __name__ == "__main__":

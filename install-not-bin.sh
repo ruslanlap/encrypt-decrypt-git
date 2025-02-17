@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Define variables
-BINARY_NAME="encrypt.sh"
-BINARY_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/master/encrypt.sh"
+SCRIPT_NAME="encrypt.sh"
+SCRIPT_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/master/encrypt.sh"
+PYTHON_SCRIPT_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/master/encrypt.py"
 CHECKSUM_URL="https://raw.githubusercontent.com/ruslanlap/encrypt-decrypt-git-python/master/encrypt.sh.sha256"
 DESTINATION_DIR="$HOME/bin"
 DESTINATION_PATH="$DESTINATION_DIR/cryptonit"
@@ -13,65 +14,122 @@ RED='\033[0;31m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Create destination directory if it doesn't exist
-mkdir -p "$DESTINATION_DIR"
-
-# Function to download and verify the checksum with progress animation
-download_and_verify() {
-  echo -e "${BLUE}Downloading '$BINARY_NAME' from GitHub...${NC}"
-  curl -o "$BINARY_NAME" -L "$BINARY_URL" &
-  pid=$!
-  spin='-\|/'
-  i=0
-  while kill -0 $pid 2>/dev/null; do
-    i=$(((i + 1) % 4))
-    printf "\r${spin:$i:1}"
-    sleep .1
-  done
-  echo -e "\r${GREEN}Download complete!${NC}"
-
-  echo -e "${BLUE}Downloading checksum...${NC}"
-  curl -o "checksum.sha256" -L "$CHECKSUM_URL"
-
-  echo -e "${BLUE}Verifying checksum...${NC}"
-  if ! sha256sum -c checksum.sha256; then
-    echo -e "${RED}❌ Checksum verification failed.${NC}"
-    exit 1
-  fi
-  echo -e "${GREEN}✅ Checksum verification successful!${NC}"
+# Check if OpenSSL is installed
+check_openssl() {
+    if ! command -v openssl &> /dev/null; then
+        echo -e "${RED}Error: OpenSSL is not installed${NC}"
+        echo "Please install OpenSSL first:"
+        echo "For Ubuntu/Debian: sudo apt-get install openssl"
+        echo "For CentOS/RHEL: sudo yum install openssl"
+        echo "For Fedora: sudo dnf install openssl"
+        exit 1
+    fi
 }
 
-# Download and verify the binary
-download_and_verify
+# Create destination directory if it doesn't exist
+create_bin_dir() {
+    if [ ! -d "$DESTINATION_DIR" ]; then
+        echo -e "${BLUE}Creating directory $DESTINATION_DIR${NC}"
+        mkdir -p "$DESTINATION_DIR"
+    fi
+}
 
-# Copy the binary to the destination directory
-echo -e "${BLUE}Copying '$BINARY_NAME' to '$DESTINATION_PATH'...${NC}"
-cp "$BINARY_NAME" "$DESTINATION_PATH"
+# Function to download and verify the checksum with progress animation
+download_files() {
+    echo -e "${BLUE}Downloading '$SCRIPT_NAME'...${NC}"
+    if ! curl -sSLo "$SCRIPT_NAME" "$SCRIPT_URL"; then
+        echo -e "${RED}Failed to download $SCRIPT_NAME${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}Download complete!${NC}"
 
-# Make the binary executable
-echo -e "${BLUE}Making '$DESTINATION_PATH' executable...${NC}"
-chmod +x "$DESTINATION_PATH"
+    echo -e "${BLUE}Downloading encrypt.py...${NC}"
+    if ! curl -sSLo "encrypt.py" "$PYTHON_SCRIPT_URL"; then
+        echo -e "${RED}Failed to download encrypt.py${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}Download complete!${NC}"
 
-# Confirm completion
-echo -e "${GREEN}✅ Installation complete! You can now use the **cryptonit** command.${NC}"
+    echo -e "${BLUE}Downloading checksum...${NC}"
+    if ! curl -sSLo "checksum.sha256" "$CHECKSUM_URL"; then
+        echo -e "${RED}Failed to download checksum${NC}"
+        exit 1
+    fi
 
-# Add ~/bin to the PATH if it's not already in the PATH
-if echo "$PATH" | grep -q "$HOME/bin"; then
-  echo -e "${BLUE}~/bin is already in your PATH.${NC}"
-else
-  echo 'export PATH="$HOME/bin:$PATH"' >>~/.bashrc
-  echo 'export PATH="$HOME/bin:$PATH"' >>~/.zshrc
-  if [ -n "$BASH_VERSION" ]; then
-    source ~/.bashrc
-  elif [ -n "$ZSH_VERSION" ]; then
-    source ~/.zshrc
-  fi
-  echo -e "${GREEN}✅ '~/bin' added to your PATH. You can now use the 'cryptonit' command.${NC}"
-fi
+    echo -e "${BLUE}Verifying checksum...${NC}"
+    if ! sha256sum -c checksum.sha256; then
+        echo -e "${RED}❌ Checksum verification failed.${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}✅ Checksum verification successful!${NC}"
+}
 
-read -p "Would you like a tip on how to use cryptonit? (y/n) " answer
-if [[ "$answer" =~ ^[Yy] ]]; then
-  echo -e "${GREEN}Tip: Use 'cryptonit -h' to see available options and how to encrypt or decrypt files!${NC}"
-else
-  echo -e "${BLUE}Maybe next time!${NC}"
-fi
+# Install the scripts
+install_scripts() {
+    echo -e "${BLUE}Installing scripts to $DESTINATION_DIR...${NC}"
+    
+    # Copy encrypt.py to bin directory
+    cp "encrypt.py" "$DESTINATION_DIR/encrypt.py"
+    
+    # Create the cryptonit wrapper script
+    cat > "$DESTINATION_PATH" << 'EOF'
+#!/bin/bash
+python3 "$HOME/bin/encrypt.py" "$@"
+EOF
+    
+    # Make scripts executable
+    chmod +x "$DESTINATION_PATH"
+    chmod +x "$DESTINATION_DIR/encrypt.py"
+    
+    echo -e "${GREEN}✅ Installation successful!${NC}"
+}
+
+# Update PATH if needed
+update_path() {
+    if [[ ":$PATH:" != *":$DESTINATION_DIR:"* ]]; then
+        echo -e "${BLUE}Adding $DESTINATION_DIR to PATH${NC}"
+        
+        # Add to .bashrc if it exists
+        if [ -f "$HOME/.bashrc" ]; then
+            echo 'export PATH="$HOME/bin:$PATH"' >> "$HOME/.bashrc"
+        fi
+        
+        # Add to .zshrc if it exists
+        if [ -f "$HOME/.zshrc" ]; then
+            echo 'export PATH="$HOME/bin:$PATH"' >> "$HOME/.zshrc"
+        fi
+        
+        # Add to .profile if it exists
+        if [ -f "$HOME/.profile" ]; then
+            echo 'export PATH="$HOME/bin:$PATH"' >> "$HOME/.profile"
+        fi
+        
+        echo -e "${GREEN}✅ PATH updated${NC}"
+        echo "Please restart your terminal or run: source ~/.bashrc"
+    fi
+}
+
+# Cleanup temporary files
+cleanup() {
+    rm -f "$SCRIPT_NAME" "checksum.sha256" "encrypt.py"
+}
+
+# Main installation process
+main() {
+    echo -e "${BLUE}Starting CRYPTONIT installation...${NC}"
+    
+    check_openssl
+    create_bin_dir
+    download_files
+    install_scripts
+    update_path
+    cleanup
+    
+    echo -e "\n${GREEN}✅ CRYPTONIT installation completed!${NC}"
+    echo -e "${BLUE}Usage:${NC}"
+    echo "1. Restart your terminal or run: source ~/.bashrc"
+    echo "2. Run 'cryptonit' to start the encryption/decryption tool"
+}
+
+# Run main installation
+main
